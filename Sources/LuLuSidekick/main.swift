@@ -65,7 +65,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                args: "curl -fL -o /tmp/App-1.0.0.dmg https://github.com/example/app/releases/download/v1.0.0/App-1.0.0.dmg",
                                destHost: "github.com", ip: "185.199.109.153", port: "443 (TCP)", reverseDNS: "unknown", timestamp: "12:07:13")
         let chain = ParentChain(entries: [
-            ChainEntry(pid: 51090, command: "/usr/bin/curl -fL -o /tmp/App-1.0.0.dmg https://github.com/..."),
+            ChainEntry(pid: 51090, command: "/usr/bin/curl -fL -o /tmp/App-1.0.0.dmg https://github.com/example/app/releases/download/v1.0.0/App-1.0.0.dmg"),
             ChainEntry(pid: 51080, command: "ruby -W0 -I /opt/homebrew/Library/Homebrew brew.rb upgrade --cask example/tap/app"),
             ChainEntry(pid: 51000, command: "-zsh"),
             ChainEntry(pid: 50990, command: "claude"),

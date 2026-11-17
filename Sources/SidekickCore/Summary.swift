@@ -26,6 +26,24 @@ public enum Summary {
         return s
     }
 
+    /// 通知のプロセスの引数とコマンドから URL を全部抜き出す（重複は除く・順番は出てきた順）。
+    /// パネルでは切らずに出す。伏せ字にした後の文字列を渡すこと。
+    public static func urls(_ f: AlertFacts, _ chain: ParentChain?) -> [String] {
+        let sources = [f.args, chain?.entries.first?.command].compactMap { $0 }
+        var out: [String] = []
+        for s in sources {
+            for m in urlRegex.matches(in: s, range: NSRange(s.startIndex..., in: s)) {
+                guard let r = Range(m.range, in: s) else { continue }
+                var u = String(s[r])
+                while let last = u.last, ".,;:)]}>'\"".contains(last) { u.removeLast() }
+                if !out.contains(u) { out.append(u) }
+            }
+        }
+        return out
+    }
+
+    static let urlRegex = try! NSRegularExpression(pattern: #"(?i)\b[a-z][a-z0-9+.-]*://[^\s'"<>]+"#)
+
     public static func destinationLine(_ f: AlertFacts, _ d: DestinationCheck?) -> String {
         let host = f.destHost ?? "不明"
         var s = host

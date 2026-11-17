@@ -116,6 +116,16 @@ final class JudgeTests: XCTestCase {
         XCTAssertEqual(Summary.chainLine(chain), "launchd → -zsh → curl x")
     }
 
+    func testURLsAreExtractedInFull() {
+        let long = "https://generativelanguage.googleapis.com/v1beta/models/gemini-4-hydrogen"
+        let f = AlertFacts(processName: "curl", pid: 1, path: "/usr/bin/curl",
+                           args: Redactor.redact("-s -H x-goog-api-key: AIzaSyBNlwJHxxxxxxxxxxxxxxxxxxxxxxxxxxx \(long)"))
+        let chain = ParentChain(entries: [ChainEntry(pid: 1, command: "curl -s \"\(long)\" https://example.com/a?b=1,"), ChainEntry(pid: 0, command: "-zsh")])
+        XCTAssertEqual(Summary.urls(f, chain), [long, "https://example.com/a?b=1"])
+        XCTAssertFalse(f.args!.contains("AIza"))
+        XCTAssertEqual(Summary.urls(AlertFacts(processName: "x", args: "-v"), nil), [])
+    }
+
     /// 実際に claude CLI を呼ぶ。RUN_CLAUDE=1 のときだけ。
     func testRealClaude() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["RUN_CLAUDE"] == "1")

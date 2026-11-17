@@ -56,11 +56,13 @@ final class PanelController {
         return l
     }
 
-    private func section(_ title: String, _ body: String) {
+    private func section(_ title: String, _ body: String, charWrap: Bool = false) {
         let t = label(title, size: 10, weight: .semibold, color: NSColor(calibratedWhite: 0.6, alpha: 1))
         stack.addArrangedSubview(t)
         stack.setCustomSpacing(1, after: t)
         let b = label(body, size: 12)
+        // URL のように空白の無い長い文字列は、単語の区切りを待たずに文字単位で折り返して全部見せる
+        if charWrap { b.lineBreakMode = .byCharWrapping; b.cell?.wraps = true }
         stack.addArrangedSubview(b)
         stack.setCustomSpacing(7, after: b)
     }
@@ -89,7 +91,10 @@ final class PanelController {
         } else {
             section("起動元", "調べています…")
         }
-        section("行き先", Summary.destinationLine(facts, investigation?.destination))
+        // 行き先: 引数に出てくる URL を省略せずに先頭へ、その下に通知のホスト・IP・ポートと正引きの照合
+        let urls = Summary.urls(facts, investigation?.chain)
+        let dest = Summary.destinationLine(facts, investigation?.destination)
+        section("行き先", (urls + [dest]).joined(separator: "\n"), charWrap: true)
 
         bg.layoutSubtreeIfNeeded()
         let h = stack.fittingSize.height + 24
