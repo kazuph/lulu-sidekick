@@ -1,0 +1,4 @@
+.build/
+build/
+.artifacts/
+.DS_Store
